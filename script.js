@@ -6,19 +6,29 @@ const sign_in_button = document.getElementById('button-sign-in')
 const sign_up_button = document.getElementById('button-sign-up')
 const sign_in_login_id = 'sign-in_user-login'
 const sign_in_pass_id = 'sign-in_user-password'
+const sign_up_login_id = 'sign-up_user-login'
+const sign_up_pass_id = 'sign-up_user-password'
+const sign_up_pass_repeated_id = 'sign-up_user-pass-repeated'
+
 const message_class = 'message-block'
-let emptyFieldMessage = 'Please add your login and password'
-let error_class = 'message-block__error'
+const error_class = 'message-block__error'
+const welcome_class = 'message-block__welcome'
+const emptyLogPassMessage = 'Please add your login and password'
+const emptyLogMessage = 'Please enter your login'
+const emptyPassMessage = 'Please enter your password'
+const emptyRepeatedPassMessage = 'Please enter your password again'
 
 window.onload = function() {
-    addOnClickTabs(tabs_buttons, tabs_blocks)
-    checkForSignIn(sign_in_button, sign_in_login_id, sign_in_pass_id, message_class, emptyFieldMessage, error_class)
+    addOnClickTabs(tabs_buttons, tabs_blocks, message_class)
+    checkSignIn(sign_in_button, sign_in_login_id, sign_in_pass_id, message_class, emptyLogPassMessage, error_class, welcome_class)
+    checkSignUp(sign_up_button, sign_up_login_id, sign_up_pass_id, sign_up_pass_repeated_id, message_class, emptyLogMessage, emptyPassMessage, emptyRepeatedPassMessage, error_class, welcome_class)
 }
 
-function addOnClickTabs(tabs_buttons, tabs_blocks) {
+function addOnClickTabs(tabs_buttons, tabs_blocks, messageClass) {
     for (let index = 0; index < tabs_buttons.length; index++) {
         let tabs_button = tabs_buttons[index]
         tabs_button.onclick = function(event) {
+            clearMessageButton(messageClass)
             for (let index = 0; index < tabs_buttons.length; index++) {
                 let _tabs_button = tabs_buttons[index]
 
@@ -31,7 +41,7 @@ function addOnClickTabs(tabs_buttons, tabs_blocks) {
     }
 }
 
-function checkForSignIn(button, login_id, pass_id, messageClass, errorMessage, errorClass) {
+function checkSignIn(button, login_id, pass_id, messageClass, errorMessage, errorClass, welcomeClass) {
     button.onclick = function (event) {
         event.preventDefault();
         clearMessageButton(messageClass)
@@ -40,12 +50,11 @@ function checkForSignIn(button, login_id, pass_id, messageClass, errorMessage, e
             getUsers(url).then((response) => {
                 let currLogin = document.getElementById(login_id).value
                 let currPass = document.getElementById(pass_id).value
-                areLogPassMatch(response, currLogin, currPass, error_class)
+                checkLogPassMatch(response, currLogin, currPass, errorClass, welcomeClass)
             })
+            return
         }
-        else {
-            renderMessageButton(errorMessage, errorClass)
-        }
+        renderMessageButton(errorMessage, errorClass)
     }
 }
 
@@ -77,27 +86,23 @@ async function getUsers(url) {
     return users
 }
 
-function areLogPassMatch(users, log, pass, errorClass) {
-    let errorLogMessage = 'Not existing login. Try again!'
+function checkLogPassMatch(users, log, pass, errorClass, welcomeClass) {
+    let errorLoginMessage = 'Not existing login. Try again!'
     let errorPassMessage = 'Wrong password. Try again!'
     let welcomeMessage = `Congratulations! You have successfully logged in as user ${log}`
-    let welcome_class = 'message-block__welcome'
 
-    let isLoginExist = users.some((user) => user.login === log)
-    if (!isLoginExist) {
-        renderMessageButton(errorLogMessage, errorClass)
+    let user = users.find((user) => user.login === log)
+    if (!user) {
+        renderMessageButton(errorLoginMessage, errorClass)
+        return
     }
-    else {
-        let isPassExist = users.some((user) => user.password === pass)
-        if (!isPassExist) {
-            renderMessageButton(errorPassMessage, errorClass)
-        }
-        else {
-            renderMessageButton(welcomeMessage, welcome_class)
-            let formBody = document.getElementById('container').childNodes[1]
-            formBody.remove()
-        }
+    if (user.password !== pass) {
+        renderMessageButton(errorPassMessage, errorClass)
+        return
     }
+    renderMessageButton(welcomeMessage, welcomeClass)
+    let formBody = document.getElementById('container').childNodes[1]
+    formBody.remove()
 }
 
 function renderMessageButton(message, className) {
@@ -106,4 +111,60 @@ function renderMessageButton(message, className) {
     messageItem.className = `message-block ${className} btn`
     messageItem.innerText = message
     container_block.append(messageItem)
+}
+
+function checkSignUp(button, login_id, pass_id, pass_repeated_id, messageClass, errorLoginMessage, errorPassMessage, errorPassRepeatedMessage, errorClass, welcomeClass) {
+    button.onclick = function (event) {
+        event.preventDefault();
+        clearMessageButton(messageClass)
+
+        if (!areValuesExist([login_id])) {
+            renderMessageButton(errorLoginMessage, errorClass)
+            return
+        }
+        if (!areValuesExist([pass_id])) {
+            renderMessageButton(errorPassMessage, errorClass)
+            return
+        }
+        if (!areValuesExist([pass_repeated_id])) {
+            renderMessageButton(errorPassRepeatedMessage, errorClass)
+            return
+        }
+        getUsers(url).then((response) => {
+            let currLogin = document.getElementById(login_id).value
+            let currPass = document.getElementById(pass_id).value
+            let currRepeatedPass = document.getElementById(pass_repeated_id).value
+            let errorLoginMessage = 'User with this login exists'
+            let errorPassMessage = 'You entered different passwords. Please edit them and try again.'
+            let welcomeMessage = `Congratulations! You have successfully registered as ${currLogin}`
+            let isLoginExist = response.some((user) => user.login === currLogin)
+
+            if (isLoginExist) {
+                renderMessageButton(errorLoginMessage, errorClass)
+                return
+            }
+            if (currPass !== currRepeatedPass) {
+                renderMessageButton(errorPassMessage, errorClass)
+                return
+            }
+            postUsers(url, currLogin, currPass).then((response) => {
+                renderMessageButton(welcomeMessage, welcomeClass)
+                let formBody = document.getElementById('container').childNodes[1]
+                formBody.remove()
+            })
+        })
+    }
+}
+
+async function postUsers(url, login, pass) {
+     await(await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            login: `${login}`,
+            password: `${pass}`
+        }),
+    })).json()
 }

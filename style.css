@@ -156,6 +156,7 @@ img {vertical-align: top;}
 .message-block__welcome, .message-block__welcome:hover {
     background-color: #60b46c;
     min-height: 80px;
+    font-size: 18px;
 }
 /*<MEDIA>========================================================================*/
 @media (max-width: 767px) {

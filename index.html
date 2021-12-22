@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="wrapper">
-    <div class="container">
+    <div class="container" id="container">
       <div id="tabs" class="tabs _tabs">
         <nav class="tabs__nav">
           <div class="tabs__button _tabs-button _active">Sign In</div>
@@ -18,37 +18,37 @@
         </nav>
         <div class="tabs__body">
           <section class="tabs__block _tabs-block _active">
-            <div class="tabs__block-section sign-in">
+            <div class="tabs__block-section sign-in" id="sign-in">
               <form action="#" class="sign-in__form form" method="post" enctype="multipart/form-data">
                 <div class="form__item">
-                  <label for="userLogin" class="form__label text">Login</label>
-                  <input id="userLogin" autocomplete="off" type="text" class="form__input" required name="uname">
+                  <label for="sign-in_user-login" class="form__label text">Login</label>
+                  <input id="sign-in_user-login" type="text" class="form__input" required name="uname">
                 </div>
                 <div class="form__item">
-                  <label for="userPassword" class="form__label text">Password</label>
-                  <input id="userPassword" autocomplete="off" type="password" class="form__input" required minlength="6"  maxlength="12" size="12" name="psw">
+                  <label for="sign-in_user-password" class="form__label text">Password</label>
+                  <input id="sign-in_user-password" type="password" class="form__input" required name="psw">
                 </div>
-                <button type="submit" class="form__btn btn">Sign In</button>
+                <button type="submit" class="form__btn btn" id="button-sign-in">Sign In</button>
               </form>
             </div>
           </section>
 
           <section class="tabs__block _tabs-block">
-            <div class="tabs__block-section sign-up">
+            <div class="tabs__block-section sign-up" id="sign-up">
               <form action="#" class="sign-up__form form" method="post" enctype="multipart/form-data">
                 <div class="form__item">
-                  <label for="userLogin-sign-up" class="form__label text">Login</label>
-                  <input id="userLogin-sign-up" autocomplete="off" type="text" class="form__input" required name="uname">
+                  <label for="sign-up_user-login" class="form__label text">Login</label>
+                  <input id="sign-up_user-login" type="text" class="form__input" required name="uname">
                 </div>
                 <div class="form__item">
-                  <label for="userPassword-sign-up" class="form__label text">Password</label>
-                  <input id="userPassword-sign-up" autocomplete="off" type="password" class="form__input" required minlength="6"  maxlength="12" size="12" name="psw">
+                  <label for="sign-up_user-pass" class="form__label text">Password</label>
+                  <input id="sign-up_user-pass" type="password" class="form__input" required name="psw">
                 </div>
                 <div class="form__item">
                   <label for="userPasswordRepeated-sign-up" class="form__label text">Repeated Password</label>
-                  <input id="userPasswordRepeated-sign-up" autocomplete="off" type="password" class="form__input" required minlength="6"  maxlength="12" size="12" name="psw">
+                  <input id="userPasswordRepeated-sign-up"  type="password" class="form__input" name="psw">
                 </div>
-                <button type="submit" class="form__btn btn">Sign Up</button>
+                <button type="submit" class="form__btn btn" id="button-sign-up">Sign Up</button>
               </form>
             </div>
           </section>
